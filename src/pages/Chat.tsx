@@ -8,21 +8,22 @@ import {
   orderBy,
 } from "firebase/firestore";
 import Sidebar from "../components/Sidebar";
+import { DocumentData } from "firebase/firestore";
+import { User } from "firebase/auth";
 
 const Chat = () => {
-  const currentUser = auth.currentUser;
-
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [messages, setMessages] = useState([]);
+  const currentUser: User | null = auth.currentUser;
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [messages, setMessages] = useState<DocumentData[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [messageSearchQuery, setMessageSearchQuery] = useState("");
 
   useEffect(() => {
-    if (selectedUser) {
+    if (selectedUser && currentUser) {
       const conversationId =
-        currentUser.uid > selectedUser.uid
-          ? `${currentUser.uid}_${selectedUser.uid}`
-          : `${selectedUser.uid}_${currentUser.uid}`;
+        (currentUser?.uid ?? "") > selectedUser.uid
+          ? `${currentUser?.uid}_${selectedUser.uid}`
+          : `${selectedUser.uid}_${currentUser?.uid}`;
 
       const messagesRef = collection(db, "chats", conversationId, "messages");
       const q = query(messagesRef, orderBy("timestamp"));
@@ -42,6 +43,13 @@ const Chat = () => {
 
   const handleSendMessage = async (e: any) => {
     e.preventDefault();
+
+    if (!currentUser) {
+      // Handle the case where currentUser is null (e.g., show an error or redirect)
+      console.error("No user is logged in");
+      return;
+    }
+
     if (newMessage.trim() && selectedUser) {
       const conversationId =
         currentUser.uid > selectedUser.uid
@@ -89,7 +97,7 @@ const Chat = () => {
                   <p
                     key={index}
                     className={`${
-                      msg.sender === currentUser.uid
+                      msg.sender === currentUser?.uid
                         ? "bg-green-600 text-white w-fit p-2 rounded-xl  mb-2 ml-auto"
                         : "bg-blue-600 text-white w-fit p-2 rounded-xl  mb-2 mr-auto "
                     } mb-2`}

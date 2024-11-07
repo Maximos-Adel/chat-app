@@ -2,10 +2,12 @@ import Navbar from "../components/Navbar";
 
 import { auth, setupFirebaseAuthPersistence } from "../../firebase";
 import { useEffect, useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
+import { User } from "firebase/auth";
 
 const MainLayout = () => {
   const [currentUser, setCurrentUser] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Ensure Firebase Authentication session persists
@@ -21,6 +23,13 @@ const MainLayout = () => {
     });
 
     return () => unsubscribe(); // Clean up the subscription on component unmount
+  }, [currentUser]);
+
+  useEffect(() => {
+    const currentUser: User | null = auth.currentUser;
+    if (!currentUser) {
+      navigate("/");
+    }
   }, [currentUser]);
 
   return (
