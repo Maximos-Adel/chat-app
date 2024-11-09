@@ -1,36 +1,31 @@
 import Navbar from "../components/Navbar";
 
-import { auth, setupFirebaseAuthPersistence } from "../../firebase";
+import { auth } from "../../firebase";
 import { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import { User } from "firebase/auth";
+import { onAuthStateChanged, User } from "firebase/auth";
 
 const MainLayout = () => {
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null); // Correctly typed state
+
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Ensure Firebase Authentication session persists
-    setupFirebaseAuthPersistence();
-
-    // Listen for changes in the auth state (e.g., after page refresh)
-    const unsubscribe = auth.onAuthStateChanged((user: any) => {
+    // Listen for authentication state changes
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        setCurrentUser(user); // Set the current user on login
+        // User is logged in
+        setCurrentUser(user);
       } else {
-        setCurrentUser(null); // Set null when logged out
+        // User is not logged in, redirect to login page
+        setCurrentUser(null);
+        navigate("/"); // or any other logic to redirect to the login page
       }
     });
 
-    return () => unsubscribe(); // Clean up the subscription on component unmount
-  }, [currentUser]);
-
-  useEffect(() => {
-    const currentUser: User | null = auth.currentUser;
-    if (!currentUser) {
-      navigate("/");
-    }
-  }, [currentUser]);
+    // Clean up the listener when the component is unmounted
+    return () => unsubscribe();
+  }, [currentUser, navigate]);
 
   return (
     <div className="p-4">
