@@ -28,9 +28,9 @@ const MainLayout = () => {
   }, [currentUser, navigate]);
 
   return (
-    <div className="p-4">
+    <div className="flex flex-col h-screen p-4">
       <Navbar />
-      <div className="mt-4">
+      <div className="flex flex-1 mt-4">
         <Outlet />
       </div>
     </div>

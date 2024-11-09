@@ -33,30 +33,29 @@ const Sidebar = ({ setSelectedUser }: any) => {
   );
 
   return (
-    <div className="w-1/4 border-r h-screen border-gray pr-4">
+    <div className="w-1/4 border-r border-gray pr-4 flex flex-col gap-2">
       <input
         type="text"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         placeholder="Search by email"
-        className="w-full border p-2 rounded-md mb-2 outline-none"
+        className="w-full border p-2 rounded-md  outline-none"
       />
-      <div>
-        {filteredUsers.map((user: any) => (
-          <div
-            key={user.uid}
-            onClick={() => setSelectedUser(user)}
-            className="flex items-center gap-2 hover:bg-gray-100 p-2 cursor-pointer rounded-lg"
-          >
-            <img
-              src={user.photoURL || "https://via.placeholder.com/40"} // Default placeholder image
-              alt={user.name}
-              className="w-10 h-10 rounded-full"
-            />
-            <p>{user.email}</p>
-          </div>
-        ))}
-      </div>
+
+      {filteredUsers.map((user: any) => (
+        <div
+          key={user.uid}
+          onClick={() => setSelectedUser(user)}
+          className="flex items-center gap-2 hover:bg-gray-100 cursor-pointer rounded-lg p-2"
+        >
+          <img
+            src={user.photoURL || "https://via.placeholder.com/40"} // Default placeholder image
+            alt={user.name}
+            className="w-10 h-10 rounded-full"
+          />
+          <p>{user.email}</p>
+        </div>
+      ))}
     </div>
   );
 };
